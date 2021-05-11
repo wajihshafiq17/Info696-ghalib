@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="./Papa/papaparse.min.js"></script>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Ghazal player</title>
+        <link rel="icon" type="image/x-icon" href="assets/img/sitar.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <link href="css/player.css" rel="stylesheet" />
+
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+       <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+            <div class="container">
+                <a class="navbar-brand js-scroll-trigger" href="index.html">Ghalib Ghazal Player</a>
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.html#about">How It Works</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="aboutghazals.html">About Ghalib & Ghazal</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="player.html">Player</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Masthead-->
+        <header class="masthead">
+            <div class="container align-items-center">
+                <div class="mx-auto text-center padding">
+                    <audio id='audio' controls autoplay>
+                        <source src="ghazal.mp3" type="audio/mpeg">
+                    </audio>
+
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="container col align-items-center bg-black project">
+                  <div class="padding">
+                    <div class="margin">
+                      <div class="text-white-50">Nastaleeq</div>
+                      <h2 id="outNast" class="">یہ نہ تھی ہماری قسمت کہ وصالِ یار ہوتا</h2>
+                    </div>
+                    <div class="margin">
+                      <div class="text-white-50">Devanagari</div>
+                      <h2 id="outDev" class="">ये न थी हमारी क़िस्मत कि विसाल-ए यार होता</h2>
+                    </div>
+                    <div class="margin">
+                      <div class="text-white-50">Translation</div>
+                      <h2 id="Translit" class="">this was not our destiny/fate-- that union with the beloved would take place</h2>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="container col align-items-center  bg-black project">
+                  <div class="padding">
+                    <div class="margin">
+                      <div  class="text-white-50">Commentary</div>
+                      <blockquote id="Commentary" class="margin">This is not a verse, but an arrow quenched in the poison of vain longing. - Bekhud Mohani</blockquote>
+                    </div>
+                  </div>
+              </div>
+            </div>
+        </header>
+
+        <!-- Footer-->
+        <footer class="footer bg-black small text-center text-white-50"><div class="container">Copyright &copy; Wajih Shafiq</div></footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Third party plugin JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+
+    <!--Background photo source
+      Photo by <a href="https://unsplash.com/@meric?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Meriç Dağlı</a> on <a href="https://unsplash.com/s/photos/persian-art?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+    -->
+
+<script>
+    let pos = $(document).scrollTop();
+    var aud = document.getElementById("audio");
+    var data;
+
+    //This block reads the csv and once csv is read
+    //it moves the rows of the csv in the variable data
+
+    function populatedata(d) {
+        console.log(d);
+        data = d;
+    }
+    function parseData(url, callBack) {
+    Papa.parse(url, {
+        download: true,
+        dynamicTyping: true,
+        complete: function(results) {
+            callBack(results.data);
+        }
+    });
+    }
+    parseData("check.txt", populatedata);
+
+    // This block updates the lyrics by comparing the start
+    // time from data var and curr time of the audio
+
+    aud.ontimeupdate = function() {
+        currtime = parseInt(audio.currentTime); //this is in seconds
+        
+        for(i=0;i<data.length-1;i++){
+            
+            if(data[i][0].includes(":")){
+
+                item = data[i][0];
+                item = item.split(":");
+                minutes = parseInt(item[0]);
+                seconds = parseInt(item[1]);
+                starttime = minutes*60 + seconds;
+
+                item = data[i][1];
+                item = item.split(":");
+                minutes = parseInt(item[0]);
+                seconds = parseInt(item[1]);
+                endtime = minutes*60 + seconds;
+                
+                if(currtime >= starttime && currtime <= endtime){
+                    var elementVarNast = document.getElementById("outNast");
+                    elementVarNast.innerHTML = data[i][2];
+                    var elementVarDev = document.getElementById("outDev");
+                    elementVarDev.innerHTML = data[i][3];
+                    var elementVarRom = document.getElementById("Translit");
+                    elementVarRom.innerHTML = data[i][5];
+                    var elementVarRom = document.getElementById("Commentary");
+                    elementVarRom.innerHTML = data[i][6];
+                }
+            }
+        }
+    };
+
+</script>
+</html>
